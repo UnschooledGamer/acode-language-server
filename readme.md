@@ -1,10 +1,8 @@
 # Acode Language Server
- 
- Express websocket application for thw acode language servers plugin.
- 
- 
-## Running locally
 
+ Express websocket application for thw acode language servers plugin.
+
+## Running locally
 
 To setup and run this plugin locally:
 
@@ -13,9 +11,7 @@ To setup and run this plugin locally:
 - Run `npm install`
 - Start server (`node server.mjs`)
 
-
 ## Contributing
-
 
 Users can also add other language servers and send a pull request so they are
 added to the plugin.
@@ -27,4 +23,3 @@ You can also use the `python` mode as an example on how to setup a websocket
 proxy if the target language server can only be started as a websocket server.
 
 An example of a stdin and stdout language server would be added in future.
-

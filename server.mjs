@@ -3,7 +3,9 @@
 import express from "express";
 import expressWs from "express-ws";
 import { spawn } from "node:child_process";
+import { inspect } from "util";
 // import Buffer from "node:buffer";
+
 
 import {
   createConnection,
@@ -19,9 +21,47 @@ import {
   WebSocketMessageReader,
   WebSocketMessageWriter
 } from "vscode-ws-jsonrpc";
+import { handleArgvOptions } from "./utils/handleArgvOptions.mjs";
 
-const DEBUG = false;
 const VERSION = "1.0.6";
+const LOG_STDOUT_DEPTH = 1;
+const PROJECT_NAME = "acode-lsp";
+let DEBUG = false;
+
+const commands = [{
+  name: "--help",
+  aliases: ["-h"],
+  description: "Shows help",
+  exec: () => {
+
+    const formattedCmdsArr = commands.map((cmd) => {
+
+      return `${cmd.name}${cmd.aliases.length ? ` | ${cmd.aliases.join(" | ")}` : ""}\t${cmd.description}`
+
+    })
+
+    console.log(`${PROJECT_NAME} [options]\n Version: ${VERSION}\n\n \x1b[4mOptions:\x1b[0m \n ${formattedCmdsArr.join("\n ")}`)
+    process.exit(0)
+  }
+}, {
+  name: "--version",
+  aliases: ["-v"],
+  description: "Shows version",
+  exec: () => {
+    console.log(`${PROJECT_NAME} Version: ${VERSION}`)
+    process.exit(0)
+  }
+}, {
+  name: "--debug",
+  aliases: ["-d"],
+  description: "Enables debug mode",
+  exec: () => {
+    DEBUG = true
+    return;
+  }
+}]
+
+handleArgvOptions(process.argv.slice(2), commands)
 
 class WebSocketProxy extends EventTarget {
   onopen;
@@ -235,7 +275,7 @@ function proxyServer(websocket, command, args, { callback, seperator } = {}) {
   // Pipe data from the language server stdout to the WebSocket
   stdoutStream.on("data", data => {
     let dataString = data.toString();
-    DEBUG && console.log("Raw:", dataString);
+    DEBUG && console.log("Lsp stdout Data > Websocket Client:", inspect(dataString, false, LOG_STDOUT_DEPTH));
 
     // Check if the data contains 'Content-Length'
     if (dataString.includes("Content-Length")) {

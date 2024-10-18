@@ -1,0 +1,4 @@
+node_modules
+# Ignores All lock files
+*-lock.*
+*.lock
